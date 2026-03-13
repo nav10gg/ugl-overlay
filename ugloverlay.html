@@ -1,137 +1,121 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Squad Tracker Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CUSTOMIZE YOUR LOOK HERE --- */
+        
+        /* This makes the background completely transparent for OBS */
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        /* The design of the visual box */
+        #overlay-box {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(40, 40, 40, 0.8) 100%);
+            border: 3px solid #ffcc00; /* Gold border - change this hex code to change the color! */
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: inline-block;
+            margin: 20px;
+            box-shadow: 0px 0px 15px rgba(255, 204, 0, 0.5); /* Glow effect */
+            transition: opacity 0.5s ease;
+        }
+
+        /* Hide the overlay completely if the player isn't LIVE */
+        .hidden { opacity: 0 !important; }
+
+        /* Text styling - change sizes and colors here */
+        .header { font-size: 18px; color: #aaaaaa; margin: 0 0 5px 0; letter-spacing: 2px;}
+        .score { font-size: 42px; margin: 0; text-shadow: 2px 2px 4px #000; color: #fff;}
+        .pot { font-size: 24px; color: #55ff55; margin: 10px 0 0 0; text-shadow: 1px 1px 3px #000;}
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Live Squad Tracker Overlay&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* --- CUSTOMIZE YOUR LOOK HERE --- */</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* This makes the background completely transparent for OBS */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: rgba(0, 0, 0, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Montserrat', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-transform: uppercase;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* The design of the visual box */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#overlay-box {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(40, 40, 40, 0.8) 100%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 3px solid #ffcc00; /* Gold border - change this hex code to change the color! */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px 25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0px 0px 15px rgba(255, 204, 0, 0.5); /* Glow effect */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: opacity 0.5s ease;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Hide the overlay completely if the player isn't LIVE */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.hidden { opacity: 0 !important; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Text styling - change sizes and colors here */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header { font-size: 18px; color: #aaaaaa; margin: 0 0 5px 0; letter-spacing: 2px;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.score { font-size: 42px; margin: 0; text-shadow: 2px 2px 4px #000; color: #fff;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.pot { font-size: 24px; color: #55ff55; margin: 10px 0 0 0; text-shadow: 1px 1px 3px #000;}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="overlay-box" class="hidden"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="header" id="game-mode"&gt;SEARCHING FOR RUN...&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="score"&gt;SCORE: &lt;span id="team-score"&gt;0&lt;/span&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="pot"&gt;POT: &lt;span id="total-pot"&gt;$0&lt;/span&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- 1. PASTE YOUR PUBLISHED GOOGLE SHEETS CSV LINK HERE ---</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const csvUrl = "YOUR_GOOGLE_SHEETS_CSV_LINK_HERE";</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// This grabs the Discord ID from the URL (e.g., ?user=123456789)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const urlParams = new URLSearchParams(window.location.search);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const playerDiscordId = urlParams.get('user');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Helper function to properly read CSV lines</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function parseCSVRow(row) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(item =&gt; item.replace(/(^"|"$)/g, '').trim());</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function fetchLiveScore() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!playerDiscordId) return; // If there's no Discord ID in the link, do nothing</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const response = await fetch(csvUrl);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const data = await response.text();</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Split the CSV into rows, ignoring the header row</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const rows = data.split('\n').slice(1);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>let playerIsLive = false;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>for (let row of rows) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (!row.trim()) continue; // Skip blank lines</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const columns = parseCSVRow(row);</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Column Map based on our exact Stream_Feed:</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// [2] Game Mode | [3] Total Score<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// [4] P1 ID | [5] P2 ID | [6] P3 ID | [7] P4 ID</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// [8] Total Pot</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const p1 = columns[4];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const p2 = columns[5];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const p3 = columns[6];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const p4 = columns[7];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Check if our player's Discord ID is in any of the 4 player columns</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (playerDiscordId === p1 || playerDiscordId === p2 || playerDiscordId === p3 || playerDiscordId === p4) {</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>// We found them! Update the text on screen.</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('game-mode').innerText = columns[2] + " RUN";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('team-score').innerText = columns[3] || "0";</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('total-pot').innerText = columns[8] || "$0";</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>// Make sure the box is visible</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.getElementById('overlay-box').classList.remove('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>playerIsLive = true;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>break; // Stop searching once we find them</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// If they aren't in the sheet as LIVE, hide the overlay</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!playerIsLive) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>document.getElementById('overlay-box').classList.add('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("Error fetching data: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Run the fetch immediately, then check again every 10 seconds</p>
-<p class="p1"><span class="Apple-converted-space">        </span>fetchLiveScore();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>setInterval(fetchLiveScore, 10000);<span class="Apple-converted-space"> </span></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+    <div id="overlay-box" class="hidden">
+        <p class="header" id="game-mode">SEARCHING FOR RUN...</p>
+        <p class="score">SCORE: <span id="team-score">0</span></p>
+        <p class="pot">POT: <span id="total-pot">$0</span></p>
+    </div>
+
+    <script>
+        // --- 1. PASTE YOUR PUBLISHED GOOGLE SHEETS CSV LINK HERE ---
+        const csvUrl = "";
+        
+        // This grabs the Discord ID from the URL (e.g., ?user=123456789)
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerDiscordId = urlParams.get('user');
+
+        // Helper function to properly read CSV lines
+        function parseCSVRow(row) {
+            return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(item => item.replace(/(^"|"$)/g, '').trim());
+        }
+
+        async function fetchLiveScore() {
+            if (!playerDiscordId) return; // If there's no Discord ID in the link, do nothing
+
+            try {
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                
+                // Split the CSV into rows, ignoring the header row
+                const rows = data.split('\n').slice(1); 
+                let playerIsLive = false;
+
+                for (let row of rows) {
+                    if (!row.trim()) continue; // Skip blank lines
+                    
+                    const columns = parseCSVRow(row);
+                    
+                    // Column Map based on our exact Stream_Feed:
+                    // [2] Game Mode | [3] Total Score 
+                    // [4] P1 ID | [5] P2 ID | [6] P3 ID | [7] P4 ID
+                    // [8] Total Pot
+
+                    const p1 = columns[4];
+                    const p2 = columns[5];
+                    const p3 = columns[6];
+                    const p4 = columns[7];
+
+                    // Check if our player's Discord ID is in any of the 4 player columns
+                    if (playerDiscordId === p1 || playerDiscordId === p2 || playerDiscordId === p3 || playerDiscordId === p4) {
+                        
+                        // We found them! Update the text on screen.
+                        document.getElementById('game-mode').innerText = columns[2] + " RUN";
+                        document.getElementById('team-score').innerText = columns[3] || "0";
+                        document.getElementById('total-pot').innerText = columns[8] || "$0";
+                        
+                        // Make sure the box is visible
+                        document.getElementById('overlay-box').classList.remove('hidden');
+                        playerIsLive = true;
+                        break; // Stop searching once we find them
+                    }
+                }
+
+                // If they aren't in the sheet as LIVE, hide the overlay
+                if (!playerIsLive) {
+                    document.getElementById('overlay-box').classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        }
+
+        // Run the fetch immediately, then check again every 10 seconds
+        fetchLiveScore();
+        setInterval(fetchLiveScore, 10000); 
+
+    </script>
 </body>
 </html>
