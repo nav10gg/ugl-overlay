@@ -82,10 +82,11 @@
                     // [4] P1 ID | [5] P2 ID | [6] P3 ID | [7] P4 ID
                     // [8] Total Pot
 
-                    const p1 = columns[4];
-                    const p2 = columns[5];
-                    const p3 = columns[6];
-                    const p4 = columns[7];
+                   // We add .replace(/'/g, '') to snip off the apostrophe!
+                    const p1 = columns[4] ? columns[4].replace(/'/g, '') : "";
+                    const p2 = columns[5] ? columns[5].replace(/'/g, '') : "";
+                    const p3 = columns[6] ? columns[6].replace(/'/g, '') : "";
+                    const p4 = columns[7] ? columns[7].replace(/'/g, '') : "";
 
                     // Check if our player's Discord ID is in any of the 4 player columns
                     if (playerDiscordId === p1 || playerDiscordId === p2 || playerDiscordId === p3 || playerDiscordId === p4) {
