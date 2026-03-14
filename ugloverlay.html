@@ -3,47 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Squad Tracker Overlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <title>UGL Live Score Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Russo+One&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CUSTOMIZE YOUR LOOK HERE --- */
-        
         /* This makes the background completely transparent for OBS */
         body {
             background-color: rgba(0, 0, 0, 0);
             margin: 0;
             overflow: hidden;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
             color: white;
             text-transform: uppercase;
         }
 
-        /* The design of the visual box */
+        /* The UGL Custom Box Design */
         #overlay-box {
-            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(40, 40, 40, 0.8) 100%);
-            border: 3px solid #ffcc00; /* Gold border - change this hex code to change the color! */
-            border-radius: 12px;
-            padding: 15px 25px;
+            /* Deep purple gradient matching the umbrella */
+            background: linear-gradient(135deg, rgba(35, 15, 65, 0.95) 0%, rgba(15, 5, 30, 0.9) 100%);
+            /* Metallic silver border matching the banner */
+            border: 2px solid #d1d5db; 
+            border-radius: 8px;
+            padding: 20px 35px;
             display: inline-block;
             margin: 20px;
-            box-shadow: 0px 0px 15px rgba(255, 204, 0, 0.5); /* Glow effect */
+            /* Neon blue outer glow to match the shield backlight, with a subtle purple inner glow */
+            box-shadow: 0px 0px 25px rgba(0, 212, 255, 0.5), inset 0px 0px 15px rgba(139, 64, 184, 0.4);
             transition: opacity 0.5s ease;
         }
 
         /* Hide the overlay completely if the player isn't LIVE */
         .hidden { opacity: 0 !important; }
 
-        /* Text styling - change sizes and colors here */
-        .header { font-size: 18px; color: #aaaaaa; margin: 0 0 5px 0; letter-spacing: 2px;}
-        .score { font-size: 42px; margin: 0; text-shadow: 2px 2px 4px #000; color: #fff;}
-        .pot { font-size: 24px; color: #55ff55; margin: 10px 0 0 0; text-shadow: 1px 1px 3px #000;}
+        /* UGL Header styling */
+        .header { 
+            font-family: 'Russo One', sans-serif;
+            font-size: 22px; 
+            color: #bfa3ff; /* Light purple */
+            margin: 0 0 5px 0; 
+            letter-spacing: 3px;
+            text-shadow: 0px 0px 8px rgba(191, 163, 255, 0.6);
+        }
+        
+        /* The Score styling */
+        .score { 
+            font-size: 55px; 
+            margin: 0; 
+            font-weight: 700;
+            /* White text with a deep purple block shadow */
+            text-shadow: 4px 4px 0px #4b207f, 0px 0px 15px rgba(0, 212, 255, 0.6); 
+            color: #ffffff;
+            line-height: 1;
+        }
+        
+        /* The Pot styling */
+        .pot { 
+            font-size: 32px; 
+            color: #00d4ff; /* Electric blue to match the glow */
+            margin: 10px 0 0 0; 
+            font-weight: 700;
+            text-shadow: 2px 2px 4px #000, 0px 0px 12px rgba(0, 212, 255, 0.8);
+        }
     </style>
 </head>
 <body>
 
     <div id="overlay-box" class="hidden">
-        <p class="header" id="game-mode">SEARCHING FOR RUN...</p>
+        <p class="header" id="game-mode">SEARCHING...</p>
         <p class="score">SCORE: <span id="team-score">0</span></p>
         <p class="pot">POT: <span id="total-pot">$0</span></p>
     </div>
@@ -52,58 +78,47 @@
         // --- 1. PASTE YOUR PUBLISHED GOOGLE SHEETS CSV LINK HERE ---
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTU2oglmE4wbIunmXgsJSDOHhBIJ5u5-I-29ThRVzcVWNIr11rShD4K0W2KrzypUoAJRsO6q5wEVYfe/pub?gid=180899896&single=true&output=csv";
         
-        // This grabs the Discord ID from the URL (e.g., ?user=123456789)
+        // Grabs the Discord ID from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const playerDiscordId = urlParams.get('user');
 
-        // Helper function to properly read CSV lines
         function parseCSVRow(row) {
             return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(item => item.replace(/(^"|"$)/g, '').trim());
         }
 
         async function fetchLiveScore() {
-            if (!playerDiscordId) return; // If there's no Discord ID in the link, do nothing
+            if (!playerDiscordId) return; 
 
             try {
                 const response = await fetch(csvUrl);
                 const data = await response.text();
                 
-                // Split the CSV into rows, ignoring the header row
                 const rows = data.split('\n').slice(1); 
                 let playerIsLive = false;
 
                 for (let row of rows) {
-                    if (!row.trim()) continue; // Skip blank lines
+                    if (!row.trim()) continue; 
                     
                     const columns = parseCSVRow(row);
-                    
-                    // Column Map based on our exact Stream_Feed:
-                    // [2] Game Mode | [3] Total Score 
-                    // [4] P1 ID | [5] P2 ID | [6] P3 ID | [7] P4 ID
-                    // [8] Total Pot
 
-                   // We add .replace(/'/g, '') to snip off the apostrophe!
+                    // Snip off the apostrophe so the IDs match perfectly
                     const p1 = columns[4] ? columns[4].replace(/'/g, '') : "";
                     const p2 = columns[5] ? columns[5].replace(/'/g, '') : "";
                     const p3 = columns[6] ? columns[6].replace(/'/g, '') : "";
                     const p4 = columns[7] ? columns[7].replace(/'/g, '') : "";
 
-                    // Check if our player's Discord ID is in any of the 4 player columns
                     if (playerDiscordId === p1 || playerDiscordId === p2 || playerDiscordId === p3 || playerDiscordId === p4) {
                         
-                        // We found them! Update the text on screen.
                         document.getElementById('game-mode').innerText = columns[2] + " RUN";
                         document.getElementById('team-score').innerText = columns[3] || "0";
                         document.getElementById('total-pot').innerText = columns[8] || "$0";
                         
-                        // Make sure the box is visible
                         document.getElementById('overlay-box').classList.remove('hidden');
                         playerIsLive = true;
-                        break; // Stop searching once we find them
+                        break; 
                     }
                 }
 
-                // If they aren't in the sheet as LIVE, hide the overlay
                 if (!playerIsLive) {
                     document.getElementById('overlay-box').classList.add('hidden');
                 }
@@ -113,7 +128,6 @@
             }
         }
 
-        // Run the fetch immediately, then check again every 10 seconds
         fetchLiveScore();
         setInterval(fetchLiveScore, 10000); 
 
