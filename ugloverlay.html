@@ -13,7 +13,6 @@
             overflow: hidden;
             font-family: 'Rajdhani', sans-serif;
             color: white;
-            /* Places the bar at the bottom center of the screen */
             display: flex;
             justify-content: center;
             align-items: flex-end;
@@ -23,26 +22,26 @@
 
         .hidden { opacity: 0 !important; }
 
-        /* The Main Wrapper */
+        /* The Main Wrapper - Neon Blue Outer Glow */
         #overlay-bar {
             display: flex;
             align-items: stretch;
             height: 55px;
-            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.5)) drop-shadow(0px 0px 8px rgba(0, 212, 255, 0.4));
+            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 12px rgba(0, 212, 255, 0.5));
             transition: opacity 0.5s ease;
         }
 
         /* --- LOGO SECTION --- */
         .logo-box {
-            background: #111;
-            border: 2px solid #d1d5db;
+            background: linear-gradient(135deg, rgba(25, 10, 45, 0.95) 0%, rgba(15, 5, 30, 0.95) 100%);
+            border: 2px solid #d1d5db; /* Metallic Silver */
             border-right: none;
             padding: 0 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
             z-index: 3;
         }
 
@@ -51,16 +50,15 @@
             object-fit: contain;
         }
 
-        /* --- PLAYER NAMES SECTION --- */
+        /* --- DYNAMIC PLAYERS SECTION --- */
         .players-wrapper {
-            background: linear-gradient(90deg, rgba(15, 5, 30, 0.95) 0%, rgba(35, 15, 65, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(35, 15, 65, 0.95) 0%, rgba(15, 5, 30, 0.9) 100%);
             border-top: 2px solid #d1d5db;
             border-bottom: 2px solid #d1d5db;
             display: flex;
             align-items: center;
-            padding: 0 30px 0 20px;
-            /* Slants the right side of the box */
-            clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+            padding: 0 40px 0 20px;
+            clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
             z-index: 2;
         }
 
@@ -70,25 +68,26 @@
             letter-spacing: 1px;
             text-transform: uppercase;
             color: #ffffff;
-            white-space: nowrap;
+            white-space: nowrap; 
+            text-shadow: 2px 2px 0px #230f41;
         }
 
         .divider {
-            color: #8b40b8; /* UGL Purple */
+            color: #bfa3ff; /* Light Purple */
             margin: 0 12px;
             font-weight: normal;
         }
 
-        /* --- STATS SECTION (Points & Place) --- */
+        /* --- STATS SECTION --- */
         .stats-wrapper {
             display: flex;
-            background: linear-gradient(135deg, #4b207f 0%, #230f41 100%);
-            border: 2px solid #00d4ff; /* Neon Blue */
-            margin-left: -15px; /* Tucks it under the slanted player box */
-            padding-left: 15px;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            box-shadow: inset 0px 0px 15px rgba(0, 212, 255, 0.3);
+            background: linear-gradient(135deg, rgba(35, 15, 65, 0.95) 0%, rgba(15, 5, 30, 0.9) 100%);
+            border: 2px solid #d1d5db; 
+            margin-left: -20px; /* Tucks under the slant */
+            padding-left: 20px;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            box-shadow: inset 0px 0px 15px rgba(139, 64, 184, 0.4); /* Subtle purple inner glow */
             z-index: 1;
         }
 
@@ -98,17 +97,18 @@
             justify-content: center;
             align-items: center;
             padding: 0 20px;
-            min-width: 60px;
+            min-width: 80px;
+            border-right: 2px solid rgba(209, 213, 219, 0.3); /* Faded silver divider */
         }
 
-        .stat-block.points {
-            border-right: 2px solid rgba(0, 212, 255, 0.3);
+        .stat-block:last-child {
+            border-right: none; 
         }
 
         .stat-label {
             font-family: 'Russo One', sans-serif;
             font-size: 10px;
-            color: #bfa3ff;
+            color: #bfa3ff; /* Light Purple */
             line-height: 1;
             margin-bottom: 2px;
             letter-spacing: 1px;
@@ -121,6 +121,12 @@
             line-height: 1;
             text-shadow: 2px 2px 0px #000;
         }
+        
+        /* Electric Blue accents for the numbers to match the logo backlight */
+        #high-score, #total-pot { 
+            color: #00d4ff; 
+            text-shadow: 2px 2px 0px #000, 0px 0px 10px rgba(0, 212, 255, 0.5); 
+        }
     </style>
 </head>
 <body>
@@ -131,24 +137,29 @@
         </div>
 
         <div class="players-wrapper">
-            <div class="player-text" id="team-names">LOADING PLAYERS...</div>
+            <div class="player-text" id="team-names">LOADING...</div>
         </div>
 
         <div class="stats-wrapper">
-            <div class="stat-block points">
-                <span class="stat-label">POINTS</span>
+            <div class="stat-block">
+                <span class="stat-label">SCORE TO BEAT</span>
+                <span class="stat-value" id="high-score">0</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-label">OUR SCORE</span>
                 <span class="stat-value" id="team-score">0</span>
             </div>
-            <div class="stat-block place">
-                <span class="stat-label">PLACE</span>
-                <span class="stat-value" id="team-rank">-</span>
+            <div class="stat-block">
+                <span class="stat-label">PRIZE POT</span>
+                <span class="stat-value" id="total-pot">$0</span>
             </div>
         </div>
     </div>
 
     <script>
-        // --- PASTE YOUR GOOGLE SHEETS CSV LINK HERE ---
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTU2oglmE4wbIunmXgsJSDOHhBIJ5u5-I-29ThRVzcVWNIr11rShD4K0W2KrzypUoAJRsO6q5wEVYfe/pub?gid=180899896&single=true&output=csv";
+        // --- 1. PASTE YOUR GOOGLE SHEETS CSV LINK HERE ---
+        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTU2oglmE4wbIunmXgsJSDOHhBIJ5u5-I-29ThRVzcVWNIr11rShD4K0W2KrzypUoAJRsO6q5wEVYfe/pub?gid=180899896&single=true&output=csv
+";
         
         const urlParams = new URLSearchParams(window.location.search);
         const playerDiscordId = urlParams.get('user');
@@ -163,16 +174,13 @@
             try {
                 const response = await fetch(csvUrl);
                 const data = await response.text();
-                
                 const rows = data.split('\n').slice(1); 
                 let playerIsLive = false;
 
                 for (let row of rows) {
                     if (!row.trim()) continue; 
-                    
                     const columns = parseCSVRow(row);
-
-                    // IDs are currently in columns 4, 5, 6, 7
+                    
                     const p1_id = columns[4] ? columns[4].replace(/'/g, '') : "";
                     const p2_id = columns[5] ? columns[5].replace(/'/g, '') : "";
                     const p3_id = columns[6] ? columns[6].replace(/'/g, '') : "";
@@ -180,19 +188,19 @@
 
                     if (playerDiscordId === p1_id || playerDiscordId === p2_id || playerDiscordId === p3_id || playerDiscordId === p4_id) {
                         
-                        // Score
-                        document.getElementById('team-score').innerText = columns[3] || "0";
-
-                        // --- NEW DATA (We will hook this up to your Sheet next!) ---
-                        // Right now, this tells the code to look for Names in columns 9-12, and Rank in 13.
-                        // If it doesn't find them yet, it defaults to showing the Discord ID as a placeholder.
                         let teamNames = [];
-                        if (columns[9]) teamNames.push(columns[9]);
-                        if (columns[10]) teamNames.push(columns[10]);
-                        if (teamNames.length === 0) teamNames = ["PLAYER 1", "PLAYER 2"]; // Temporary fallback
+                        if (columns[8] && columns[8].trim() !== "") teamNames.push(columns[8]);
+                        if (columns[9] && columns[9].trim() !== "") teamNames.push(columns[9]);
+                        if (columns[10] && columns[10].trim() !== "") teamNames.push(columns[10]);
+                        if (columns[11] && columns[11].trim() !== "") teamNames.push(columns[11]);
+                        
+                        if (teamNames.length === 0) teamNames = ["PLAYER 1", "PLAYER 2"]; 
 
                         document.getElementById('team-names').innerHTML = teamNames.join(' <span class="divider">|</span> ');
-                        document.getElementById('team-rank').innerText = columns[13] ? columns[13] + "" : "TBD";
+
+                        document.getElementById('team-score').innerText = columns[3] || "0";
+                        document.getElementById('high-score').innerText = columns[12] || "0"; 
+                        document.getElementById('total-pot').innerText = columns[13] || "$0"; 
                         
                         document.getElementById('overlay-bar').classList.remove('hidden');
                         playerIsLive = true;
