@@ -7,104 +7,149 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Russo+One&display=swap" rel="stylesheet">
     
     <style>
-        /* This makes the background completely transparent for OBS */
         body {
             background-color: rgba(0, 0, 0, 0);
             margin: 0;
             overflow: hidden;
             font-family: 'Rajdhani', sans-serif;
             color: white;
-            text-transform: uppercase;
+            /* Places the bar at the bottom center of the screen */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100vh;
+            padding-bottom: 40px; 
         }
 
-        /* The UGL Custom Box Design */
-        #overlay-box {
-            /* Deep purple gradient matching the umbrella */
-            background: linear-gradient(135deg, rgba(35, 15, 65, 0.95) 0%, rgba(15, 5, 30, 0.9) 100%);
-            /* Metallic silver border matching the banner */
-            border: 2px solid #d1d5db; 
-            border-radius: 8px;
-            padding: 20px 35px;
-            display: inline-block;
-            margin: 20px;
-            /* Neon blue outer glow to match the shield backlight, with a subtle purple inner glow */
-            box-shadow: 0px 0px 25px rgba(0, 212, 255, 0.5), inset 0px 0px 15px rgba(139, 64, 184, 0.4);
+        .hidden { opacity: 0 !important; }
+
+        /* The Main Wrapper */
+        #overlay-bar {
+            display: flex;
+            align-items: stretch;
+            height: 55px;
+            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.5)) drop-shadow(0px 0px 8px rgba(0, 212, 255, 0.4));
             transition: opacity 0.5s ease;
         }
 
-        /* Container to align logo and text side-by-side */
-        .ugl-container {
+        /* --- LOGO SECTION --- */
+        .logo-box {
+            background: #111;
+            border: 2px solid #d1d5db;
+            border-right: none;
+            padding: 0 15px;
             display: flex;
-            align-items: center; /* Vertically center items */
-            gap: 20px; /* Space between logo and text */
+            align-items: center;
+            justify-content: center;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+            z-index: 3;
         }
 
-        /* Logo styling */
         #ugl-logo {
-            max-width: 100px; /* Adjust size as needed */
-            max-height: 100px;
-            object-fit: contain; /* Maintain aspect ratio */
+            max-height: 40px;
+            object-fit: contain;
         }
 
-        /* Text content container */
-        .ugl-text-content {
+        /* --- PLAYER NAMES SECTION --- */
+        .players-wrapper {
+            background: linear-gradient(90deg, rgba(15, 5, 30, 0.95) 0%, rgba(35, 15, 65, 0.95) 100%);
+            border-top: 2px solid #d1d5db;
+            border-bottom: 2px solid #d1d5db;
             display: flex;
-            flex-direction: column; /* Align text items vertically */
-            align-items: flex-start; /* Align text to the left */
+            align-items: center;
+            padding: 0 30px 0 20px;
+            /* Slants the right side of the box */
+            clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+            z-index: 2;
         }
 
-        /* Hide the overlay completely if the player isn't LIVE */
-        .hidden { opacity: 0 !important; }
-
-        /* UGL Header styling */
-        .header { 
-            font-family: 'Russo One', sans-serif;
-            font-size: 22px; 
-            color: #bfa3ff; /* Light purple */
-            margin: 0 0 5px 0; 
-            letter-spacing: 3px;
-            text-shadow: 0px 0px 8px rgba(191, 163, 255, 0.6);
-        }
-        
-        /* The Score styling */
-        .score { 
-            font-size: 55px; 
-            margin: 0; 
+        .player-text {
+            font-size: 22px;
             font-weight: 700;
-            /* White text with a deep purple block shadow */
-            text-shadow: 4px 4px 0px #4b207f, 0px 0px 15px rgba(0, 212, 255, 0.6); 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .divider {
+            color: #8b40b8; /* UGL Purple */
+            margin: 0 12px;
+            font-weight: normal;
+        }
+
+        /* --- STATS SECTION (Points & Place) --- */
+        .stats-wrapper {
+            display: flex;
+            background: linear-gradient(135deg, #4b207f 0%, #230f41 100%);
+            border: 2px solid #00d4ff; /* Neon Blue */
+            margin-left: -15px; /* Tucks it under the slanted player box */
+            padding-left: 15px;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            box-shadow: inset 0px 0px 15px rgba(0, 212, 255, 0.3);
+            z-index: 1;
+        }
+
+        .stat-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            min-width: 60px;
+        }
+
+        .stat-block.points {
+            border-right: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .stat-label {
+            font-family: 'Russo One', sans-serif;
+            font-size: 10px;
+            color: #bfa3ff;
+            line-height: 1;
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
             color: #ffffff;
             line-height: 1;
-        }
-        
-        /* The Pot styling */
-        .pot { 
-            font-size: 32px; 
-            color: #00d4ff; /* Electric blue to match the glow */
-            margin: 10px 0 0 0; 
-            font-weight: 700;
-            text-shadow: 2px 2px 4px #000, 0px 0px 12px rgba(0, 212, 255, 0.8);
+            text-shadow: 2px 2px 0px #000;
         }
     </style>
 </head>
 <body>
 
-    <div id="overlay-box" class="hidden">
-        <div class="ugl-container">
-            <img src="https://github.com/nav10gg/ugl-overlay/blob/main/UGL_main.png?raw=true" id="ugl-logo" width="100" alt="UGL Logo">
-            <div class="ugl-text-content">
-                <p class="header" id="game-mode">SEARCHING...</p>
-                <p class="score">SCORE: <span id="team-score">0</span></p>
-                <p class="pot">POT:$ <span id="total-pot">$0</span></p>
+    <div id="overlay-bar" class="hidden">
+        <div class="logo-box">
+            <img src="https://github.com/nav10gg/ugl-overlay/blob/main/UGL_main.png?raw=true" id="ugl-logo" alt="UGL">
+        </div>
+
+        <div class="players-wrapper">
+            <div class="player-text" id="team-names">LOADING PLAYERS...</div>
+        </div>
+
+        <div class="stats-wrapper">
+            <div class="stat-block points">
+                <span class="stat-label">POINTS</span>
+                <span class="stat-value" id="team-score">0</span>
+            </div>
+            <div class="stat-block place">
+                <span class="stat-label">PLACE</span>
+                <span class="stat-value" id="team-rank">-</span>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 2. PASTE YOUR PUBLISHED GOOGLE SHEETS CSV LINK HERE ---
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTU2oglmE4wbIunmXgsJSDOHhBIJ5u5-I-29ThRVzcVWNIr11rShD4K0W2KrzypUoAJRsO6q5wEVYfe/pub?gid=180899896&single=true&output=csv";
+        // --- PASTE YOUR GOOGLE SHEETS CSV LINK HERE ---
+        const csvUrl = "YOUR_GOOGLE_SHEETS_CSV_LINK_HERE";
         
-        // Grabs the Discord ID from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const playerDiscordId = urlParams.get('user');
 
@@ -127,26 +172,36 @@
                     
                     const columns = parseCSVRow(row);
 
-                    // Snip off the apostrophe so the IDs match perfectly
-                    const p1 = columns[4] ? columns[4].replace(/'/g, '') : "";
-                    const p2 = columns[5] ? columns[5].replace(/'/g, '') : "";
-                    const p3 = columns[6] ? columns[6].replace(/'/g, '') : "";
-                    const p4 = columns[7] ? columns[7].replace(/'/g, '') : "";
+                    // IDs are currently in columns 4, 5, 6, 7
+                    const p1_id = columns[4] ? columns[4].replace(/'/g, '') : "";
+                    const p2_id = columns[5] ? columns[5].replace(/'/g, '') : "";
+                    const p3_id = columns[6] ? columns[6].replace(/'/g, '') : "";
+                    const p4_id = columns[7] ? columns[7].replace(/'/g, '') : "";
 
-                    if (playerDiscordId === p1 || playerDiscordId === p2 || playerDiscordId === p3 || playerDiscordId === p4) {
+                    if (playerDiscordId === p1_id || playerDiscordId === p2_id || playerDiscordId === p3_id || playerDiscordId === p4_id) {
                         
-                        document.getElementById('game-mode').innerText = columns[2] + " RUN";
+                        // Score
                         document.getElementById('team-score').innerText = columns[3] || "0";
-                        document.getElementById('total-pot').innerText = columns[8] || "$0";
+
+                        // --- NEW DATA (We will hook this up to your Sheet next!) ---
+                        // Right now, this tells the code to look for Names in columns 9-12, and Rank in 13.
+                        // If it doesn't find them yet, it defaults to showing the Discord ID as a placeholder.
+                        let teamNames = [];
+                        if (columns[9]) teamNames.push(columns[9]);
+                        if (columns[10]) teamNames.push(columns[10]);
+                        if (teamNames.length === 0) teamNames = ["PLAYER 1", "PLAYER 2"]; // Temporary fallback
+
+                        document.getElementById('team-names').innerHTML = teamNames.join(' <span class="divider">|</span> ');
+                        document.getElementById('team-rank').innerText = columns[13] ? columns[13] + "" : "TBD";
                         
-                        document.getElementById('overlay-box').classList.remove('hidden');
+                        document.getElementById('overlay-bar').classList.remove('hidden');
                         playerIsLive = true;
                         break; 
                     }
                 }
 
                 if (!playerIsLive) {
-                    document.getElementById('overlay-box').classList.add('hidden');
+                    document.getElementById('overlay-bar').classList.add('hidden');
                 }
 
             } catch (error) {
