@@ -15,27 +15,32 @@
             color: white;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Snaps to the top */
+            align-items: flex-start; 
             height: 100vh;
-            width: 100vw; /* Crucial for the Auto-Scaler to know the screen width */
-            padding-top: 40px; /* Distance from the top edge */
+            width: 100vw; 
+            padding-top: 40px; 
         }
 
-        .hidden { opacity: 0 !important; }
+        .hidden { display: none !important; }
 
-        /* The Main Wrapper - Neon Blue Outer Glow */
+        /* The Main Wrapper - Standard Blue Glow */
         #overlay-bar {
             display: flex;
             align-items: stretch;
             height: 55px;
             filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 12px rgba(0, 212, 255, 0.5));
-            transition: opacity 0.5s ease, transform 0.3s ease; /* Added transform for smooth shrinking */
+            transition: filter 0.5s ease, opacity 0.5s ease, transform 0.3s ease; 
+        }
+
+        /* --- LEADER MODE GLOW (GOLD) --- */
+        #overlay-bar.leader-mode {
+            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 15px rgba(255, 215, 0, 0.8));
         }
 
         /* --- LOGO SECTION --- */
         .logo-box {
             background: linear-gradient(135deg, rgba(25, 10, 45, 0.95) 0%, rgba(15, 5, 30, 0.95) 100%);
-            border: 2px solid #d1d5db; /* Metallic Silver */
+            border: 2px solid #d1d5db; 
             border-right: none;
             padding: 0 15px;
             display: flex;
@@ -71,12 +76,35 @@
             color: #ffffff;
             white-space: nowrap; 
             text-shadow: 2px 2px 0px #230f41;
+            display: flex;
+            align-items: center;
         }
 
         .divider {
-            color: #bfa3ff; /* Light Purple */
+            color: #bfa3ff; 
             margin: 0 12px;
             font-weight: normal;
+        }
+
+        /* --- LEADER BADGE --- */
+        #leader-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+            color: #000;
+            font-family: 'Russo One', sans-serif;
+            font-size: 14px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            margin-left: 15px;
+            box-shadow: 0px 0px 10px rgba(255, 215, 0, 0.5);
+            letter-spacing: 1px;
+            animation: pulse-gold 2s infinite;
+            text-shadow: none;
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0px 0px 5px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0px 0px 15px rgba(255, 215, 0, 0.9); }
+            100% { box-shadow: 0px 0px 5px rgba(255, 215, 0, 0.5); }
         }
 
         /* --- STATS SECTION --- */
@@ -84,12 +112,19 @@
             display: flex;
             background: linear-gradient(135deg, rgba(35, 15, 65, 0.95) 0%, rgba(15, 5, 30, 0.9) 100%);
             border: 2px solid #d1d5db; 
-            margin-left: -20px; /* Tucks under the slant */
+            margin-left: -20px; 
             padding-left: 20px;
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
-            box-shadow: inset 0px 0px 15px rgba(139, 64, 184, 0.4); /* Subtle purple inner glow */
+            box-shadow: inset 0px 0px 15px rgba(139, 64, 184, 0.4); 
             z-index: 1;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        /* --- LEADER MODE STATS (GOLD BORDER) --- */
+        .stats-wrapper.leader-mode {
+            border-color: #ffd700;
+            box-shadow: inset 0px 0px 15px rgba(255, 215, 0, 0.3);
         }
 
         .stat-block {
@@ -99,7 +134,7 @@
             align-items: center;
             padding: 0 20px;
             min-width: 80px;
-            border-right: 2px solid rgba(209, 213, 219, 0.3); /* Faded silver divider */
+            border-right: 2px solid rgba(209, 213, 219, 0.3); 
         }
 
         .stat-block:last-child {
@@ -109,7 +144,7 @@
         .stat-label {
             font-family: 'Russo One', sans-serif;
             font-size: 10px;
-            color: #bfa3ff; /* Light Purple */
+            color: #bfa3ff; 
             line-height: 1;
             margin-bottom: 2px;
             letter-spacing: 1px;
@@ -123,7 +158,6 @@
             text-shadow: 2px 2px 0px #000;
         }
         
-        /* Electric Blue accents for the numbers to match the logo backlight */
         #high-score, #total-pot { 
             color: #00d4ff; 
             text-shadow: 2px 2px 0px #000, 0px 0px 10px rgba(0, 212, 255, 0.5); 
@@ -138,10 +172,12 @@
         </div>
 
         <div class="players-wrapper">
-            <div class="player-text" id="team-names">LOADING...</div>
+            <div class="player-text" id="team-names">
+                </div>
+            <div id="leader-badge" class="hidden">👑 1ST PLACE</div>
         </div>
 
-        <div class="stats-wrapper">
+        <div class="stats-wrapper" id="stats-box">
             <div class="stat-block">
                 <span class="stat-label">SCORE TO BEAT</span>
                 <span class="stat-value" id="high-score">0</span>
@@ -197,17 +233,35 @@
                         if (teamNames.length === 0) teamNames = ["PLAYER 1", "PLAYER 2"]; 
 
                         document.getElementById('team-names').innerHTML = teamNames.join(' <span class="divider">|</span> ');
-                        document.getElementById('team-score').innerText = columns[3] || "0";
-                        document.getElementById('high-score').innerText = columns[12] || "0"; 
+
+                        const currentScore = parseInt(columns[3]) || 0;
+                        const highScore = parseInt(columns[12]) || 0;
+
+                        document.getElementById('team-score').innerText = currentScore;
+                        document.getElementById('high-score').innerText = highScore; 
                         document.getElementById('total-pot').innerText = columns[13] || "$0"; 
                         
                         const bar = document.getElementById('overlay-bar');
+                        const statsBox = document.getElementById('stats-box');
+                        const leaderBadge = document.getElementById('leader-badge');
+                        
                         bar.classList.remove('hidden');
 
+                        // --- THE LEADER MODE LOGIC ---
+                        // If their score equals or beats the high score (and they actually have points), turn on Gold Mode
+                        if (currentScore >= highScore && currentScore > 0) {
+                            bar.classList.add('leader-mode');
+                            statsBox.classList.add('leader-mode');
+                            leaderBadge.classList.remove('hidden');
+                        } else {
+                            bar.classList.remove('leader-mode');
+                            statsBox.classList.remove('leader-mode');
+                            leaderBadge.classList.add('hidden');
+                        }
+
                         // --- THE AUTO-SCALER LOGIC ---
-                        // Waits 50ms for the names to render, then checks if the bar is wider than the OBS window
                         setTimeout(() => {
-                            const availableWidth = window.innerWidth - 40; // 40px safety buffer
+                            const availableWidth = window.innerWidth - 40; 
                             if (bar.offsetWidth > availableWidth) {
                                 const scaleRatio = availableWidth / bar.offsetWidth;
                                 bar.style.transform = `scale(${scaleRatio})`;
@@ -234,7 +288,6 @@
         fetchLiveScore();
         setInterval(fetchLiveScore, 10000); 
         
-        // Ensure it resizes if the player drags the box while live
         window.addEventListener('resize', fetchLiveScore);
 
     </script>
