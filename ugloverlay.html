@@ -199,9 +199,43 @@
         
         const urlParams = new URLSearchParams(window.location.search);
         const playerDiscordId = urlParams.get('user');
+        
+        // --- SETUP MODE VARIABLES ---
+        let setupModeActive = true;
+        let setupTimeRemaining = 120; // 2 minutes in seconds
+
+        // The live ticking countdown clock
+        const setupTimer = setInterval(() => {
+            if (setupTimeRemaining > 0) {
+                setupTimeRemaining--;
+                // If they are not live, update the text every second
+                if (setupModeActive && document.getElementById('team-names').innerHTML.includes('SETUP MODE')) {
+                    document.getElementById('team-names').innerHTML = `SETUP MODE <span class="divider">|</span> HIDING IN ${setupTimeRemaining}s`;
+                }
+            } else {
+                // Time is up! Kill the timer and force a refresh to hide the bar
+                setupModeActive = false;
+                clearInterval(setupTimer);
+                fetchLiveScore(); 
+            }
+        }, 1000);
 
         function parseCSVRow(row) {
             return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(item => item.replace(/(^"|"$)/g, '').trim());
+        }
+
+        function applyAutoScaler() {
+            const bar = document.getElementById('overlay-bar');
+            setTimeout(() => {
+                const availableWidth = window.innerWidth - 40; 
+                if (bar.offsetWidth > availableWidth) {
+                    const scaleRatio = availableWidth / bar.offsetWidth;
+                    bar.style.transform = `scale(${scaleRatio})`;
+                    bar.style.transformOrigin = 'top center';
+                } else {
+                    bar.style.transform = `scale(1)`;
+                }
+            }, 50);
         }
 
         async function fetchLiveScore() {
@@ -212,6 +246,10 @@
                 const data = await response.text();
                 const rows = data.split('\n').slice(1); 
                 let playerIsLive = false;
+
+                const bar = document.getElementById('overlay-bar');
+                const statsBox = document.getElementById('stats-box');
+                const leaderBadge = document.getElementById('leader-badge');
 
                 for (let row of rows) {
                     if (!row.trim()) continue; 
@@ -241,14 +279,8 @@
                         document.getElementById('high-score').innerText = highScore; 
                         document.getElementById('total-pot').innerText = columns[13] || "$0"; 
                         
-                        const bar = document.getElementById('overlay-bar');
-                        const statsBox = document.getElementById('stats-box');
-                        const leaderBadge = document.getElementById('leader-badge');
-                        
                         bar.classList.remove('hidden');
 
-                        // --- THE LEADER MODE LOGIC ---
-                        // If their score equals or beats the high score (and they actually have points), turn on Gold Mode
                         if (currentScore >= highScore && currentScore > 0) {
                             bar.classList.add('leader-mode');
                             statsBox.classList.add('leader-mode');
@@ -259,25 +291,36 @@
                             leaderBadge.classList.add('hidden');
                         }
 
-                        // --- THE AUTO-SCALER LOGIC ---
-                        setTimeout(() => {
-                            const availableWidth = window.innerWidth - 40; 
-                            if (bar.offsetWidth > availableWidth) {
-                                const scaleRatio = availableWidth / bar.offsetWidth;
-                                bar.style.transform = `scale(${scaleRatio})`;
-                                bar.style.transformOrigin = 'top center';
-                            } else {
-                                bar.style.transform = `scale(1)`;
-                            }
-                        }, 50);
-
+                        applyAutoScaler();
                         playerIsLive = true;
+                        
+                        // If they go live before the 2 minutes are up, kill the setup timer
+                        setupModeActive = false;
+                        clearInterval(setupTimer);
+                        
                         break; 
                     }
                 }
 
+                // If they are not live in the database...
                 if (!playerIsLive) {
-                    document.getElementById('overlay-bar').classList.add('hidden');
+                    if (setupModeActive) {
+                        // Show the Dummy Setup Overlay with the live countdown
+                        document.getElementById('team-names').innerHTML = `SETUP MODE <span class="divider">|</span> HIDING IN ${setupTimeRemaining}s`;
+                        document.getElementById('team-score').innerText = "0";
+                        document.getElementById('high-score').innerText = "150"; 
+                        document.getElementById('total-pot').innerText = "$500"; 
+                        
+                        bar.classList.remove('hidden');
+                        bar.classList.remove('leader-mode');
+                        statsBox.classList.remove('leader-mode');
+                        leaderBadge.classList.add('hidden');
+                        
+                        applyAutoScaler();
+                    } else {
+                        // Setup timer is over, hide it entirely
+                        bar.classList.add('hidden');
+                    }
                 }
 
             } catch (error) {
@@ -286,6 +329,7 @@
         }
 
         fetchLiveScore();
+        // Keep the 10-second data pull running in the background
         setInterval(fetchLiveScore, 10000); 
         
         window.addEventListener('resize', fetchLiveScore);
